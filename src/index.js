@@ -8,6 +8,13 @@ const taskRouter = require('./routers/taskRouter')
 
 const app = express()
 const port = process.env.PORT || 3000
+
+/*
+app.use((req,res,next)=>{
+    res.status('503').send('site under maintanance')
+})*/
+
+
 app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
