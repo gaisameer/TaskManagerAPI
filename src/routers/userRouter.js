@@ -11,7 +11,7 @@ router.post('/users',async(req,res)=>{
     try{
         const token = await user.generateAuthToken()
         await user.save()
-        res.status(201).send({user,token})
+        res.status(201).send({user : user.getPublicProfile(),token})
     }catch(e){
         res.status(400).send(e)
     }
@@ -21,12 +21,36 @@ router.post('/users/login',async(req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email,req.body.password)
         const token = await user.generateAuthToken()
-        res.send({user,token})
+       // console.log(user.getPublicProfile())
+        res.send({user ,token})
     }catch(e){
         console.log(e)
         res.status(400).send()
     }
     
+})
+
+router.post('/user/logout', auth , async(req,res)=>{
+    try{
+        req.user.tokens = req.user.tokens.filter((token)=>{
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send()
+    } catch(e){
+        res.status(500).send()
+    }
+})
+
+//logiyt all sessions
+router.post('/user/logoutAll',auth,async(req,res)=>{
+    try{
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch(e){
+        res.status(500).send()
+    }
 })
 
 
