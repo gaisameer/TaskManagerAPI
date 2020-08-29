@@ -53,7 +53,7 @@ router.post('/user/logoutAll',auth,async(req,res)=>{
     }
 })
 
-
+/*
 router.get('/users/:id',async(req,res)=>{
     const id = req.params.id
     try{
@@ -66,7 +66,7 @@ router.get('/users/:id',async(req,res)=>{
         res.status(500).send()
     }
 })
-
+*/
 
 router.get('/user/profile', auth,async(req,res)=>{
     try{
@@ -78,7 +78,7 @@ router.get('/user/profile', auth,async(req,res)=>{
     }
 })
 
-router.patch('/users/:id',async(req,res)=>{
+router.patch('/users/me',auth,async(req,res)=>{
     const allowed = ['name','email','age','password']
     const updates = Object.keys(req.body)
     const isValid = updates.every((update)=>{
@@ -89,29 +89,30 @@ router.patch('/users/:id',async(req,res)=>{
         return res.status(400).send({error : 'invalid updates'})
     }
     try{
-        const user = await User.findById(req.params.id)
+        // const user = await User.findById(req.params.id)
         updates.forEach((update)=>{
-            user[update] = req.body[updates]
+            req.user[update] = req.body[updates]
         })
         //const user = await User.findByIdAndUpdate(req.params.id , req.body , { new : true , runValidators :true})
-        if(!user){
-            return res.status(404).send()
-        }
-        await user.save()
-        res.send(user)
+        // if(!user){
+        //     return res.status(404).send()
+        // }
+        await req.user.save()
+        res.send(req.user)
     }catch(e){
         res.status(400).send()
     }
 })
 
 
-router.delete('/users/:id',async(req,res)=>{
+router.delete('/users/me',auth,async(req,res)=>{
     try{
-        const user = await User.findByIdAndDelete(req.params.id)
-        if(!user){
-            return res.status(404).send()
-        }
-        res.send(user)
+        //const user = await User.findByIdAndDelete(req.user._id)
+        // if(!user){
+        //     return res.status(404).send()
+        // }
+        await req.user.remove()
+        res.send(req.user)
     } catch(e){
         res.status(500).send()
     }
